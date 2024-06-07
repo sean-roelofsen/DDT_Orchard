@@ -3,7 +3,7 @@
   "short_name": "Niagara Orchards",
   "icons": [
     {
-      "src": "https://raw.githubusercontent.com/sean-roelofsen/smithville_wells/main/wells.png",
+      "src": "https://raw.githubusercontent.com/sean-roelofsen/DDT_Orchard/main/pear-android-icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png"
     }
