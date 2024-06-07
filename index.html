@@ -32,6 +32,9 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.3/css/all.css" />
     <!-- Leaflet PolylineMeasure CSS -->
     <link rel="stylesheet" href="https://ppete2.github.io/Leaflet.PolylineMeasure/Leaflet.PolylineMeasure.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-labeltextcollision/dist/leaflet.labeltextcollision.css" />
+
+
     <!-- Custom CSS -->
     <link rel="stylesheet" href="style.css" />
 
@@ -51,6 +54,7 @@
     <script src="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2.4.0/src/easy-button.js"></script>
     <!-- Leaflet PolylineMeasure JS -->
     <script src="https://ppete2.github.io/Leaflet.PolylineMeasure/Leaflet.PolylineMeasure.js"></script>
+    <script src="https://unpkg.com/leaflet-labeltextcollision/dist/leaflet.labeltextcollision.js"></script>
 
 </head>
 
@@ -1498,6 +1502,8 @@ popupText += (feature.properties.Orchard_Pr) ? 'Property: ' + feature.properties
 popupText += (feature.properties.Orchard__2) ? '<br>Main Address: ' + feature.properties.Orchard__2 : '';
 
 popupText += (feature.properties.Orchard__3) ? '<br>Municipality: ' + feature.properties.Orchard__3 : '';
+
+popupText += (feature.properties.OFFICIAL_N) ? '<br>Name: ' + feature.properties.OFFICIAL_N : '';
 // "STREET_NUM":"725","STREET_NAM":"Lakeshore","SUFFIX":"Road","DIRECTION":"","P_O_BOX":"","MUNICIPALI":"Fort Erie",
 
 //feeding trenary results through a replace function in order to format URLs into proper clickable hyperlinks in the popups
@@ -2493,7 +2499,7 @@ fetch(geojsonUrl6)
   .catch(error => console.error('Error fetching GeoJSON data:', error));
 
 //************************ALL WELLS LAYER***************
-
+//https://raw.githubusercontent.com/sean-roelofsen/DDT_Orchard/main/Orchard_Watercourses.geojson
 
 function getSevenMarker(feature, latlng) {
   var iconColor = '#000000'; // Define the icon color
@@ -2520,6 +2526,37 @@ fetch(geojsonUrl7)
   })
   .catch(error => console.error('Error fetching GeoJSON data:', error));
 */
+
+//*********************WATERCOURSES*********************
+function getSevenStyle(feature) {
+    return {
+        color: '#0000FF', // Define the polyline color
+        weight: 2,        // Define the polyline width
+        opacity: 1
+    };
+}
+
+function onEachFeature(feature, layer) {
+    if (feature.properties && feature.properties.OFFICIAL_N) {
+        layer.bindPopup("Name: " + feature.properties.OFFICIAL_N);
+    }
+}
+
+var sevenLayer = L.geoJson(null, {
+    style: getSevenStyle,
+    onEachFeature: onEachFeature,
+    onEachFeature: getPopup
+})//.addTo(map);
+
+var geojsonUrl7 = "https://raw.githubusercontent.com/sean-roelofsen/DDT_Orchard/main/Orchard_Watercourses.geojson";
+
+fetch(geojsonUrl7)
+    .then(response => response.json())
+    .then(data => {
+        sevenLayer.addData(data);
+    })
+    .catch(error => console.error('Error fetching GeoJSON data:', error));
+
 
 //*****************************PROPERTIES POLYGONS*****************
 
@@ -2600,8 +2637,8 @@ var overlays = {
     //'Permits-To-Take-Water (PTTW)': sixLayer,
     //'MECP WWIS Database Wells': fourLayer,
     //'OP 500m Restriction Zone': fiveLayer,
-    //'All MECP Wells': sevenLayer,
     'Orchard Properties': eightLayer,
+    'Watercourses': sevenLayer,
     //'DW Storage Facilities': twentytwoLayer,
     
     //'Wastewater Treatment Plants': twentythreeLayer,
