@@ -1495,7 +1495,11 @@ popupText += (feature.properties.DDX_ng_g) ? '<br>DDX: ' + feature.properties.DD
 
 popupText += (feature.properties.F__DTT) ? '<br>% DTT: ' + feature.properties.F__DTT : '';
 
-popupText += (feature.properties.Group_) ? '<br><br>Group: ' + feature.properties.Group_ : '';
+popupText += (feature.properties.NEAR_DIST) ? '<br><br><u>To Nearest Watercourse</u><br>Distance (m):  ' + feature.properties.NEAR_DIST.toFixed(1) : '';
+
+popupText += (feature.properties.NEAR_ANGLE) ? '<br>Direction° (0°=N|+90°=E|±180°=S|-90°=W):  ' + feature.properties.NEAR_ANGLE.toFixed(1) : '';
+
+//popupText += (feature.properties.Group_) ? '<br><br>Group: ' + feature.properties.Group_ : '';
 
 popupText += (feature.properties.Orchard_Pr) ? 'Property: ' + feature.properties.Orchard_Pr : '';
 
@@ -2261,16 +2265,37 @@ $.getJSON(geoJson32, function(data) {
 }
 
 */
+function getOutlineColor(value) {
+            if (value < 500) {
+                return 'green';
+            } else if (value <= 1000) {
+                return 'blue';
+            } else if (value <= 2000) {
+                return 'brown';
+            } else if (value <= 3000) {
+                return 'orange';
+            } else {
+                return 'red';
+            }
+        }
 
-function getOneMarker(feature, latlng) {
+        function getOneMarker(feature, latlng) {
     var iconColor = '#FFD43b'; // Define the icon color
     var plot = feature.properties.Plot; // Assuming "Plot" column has the Roman numeral as a string
+    var ddxValue = feature.properties.DDX_ng_g; // Get the value for coloring the outline
+    var outlineColor = getOutlineColor(ddxValue); // Determine the outline color
+
     var labelStyle = 'position: absolute; font-size: 12px; top: 50%; left: 50%; transform: translate(-50%, -50%); color: black;'; // Adjust font-size and color as needed
+
+    // Define the size of the outline circle
+    var outlineSize = 12; // Change this value to your desired size
+    var outlineThickness = 3.5; // Define the thickness of the outline
 
     var icon1 = L.divIcon({
         className: '', // Set to an empty string to avoid default styles
-        html: '<div style="position: relative; text-align: center;">' +
-              '<i style="color: ' + iconColor + '; text-shadow: 0 0 0.5px black, 0 0 0.5px black, 0 0 0.5px black, 0 0 0.5px black;" class="fas fa-circle"></i>' +
+        html: '<div style="position: relative; text-align: center; width: ' + (outlineSize + outlineThickness * 2) + 'px; height: ' + (outlineSize + outlineThickness * 2) + 'px;">' +
+              '<div style="position: absolute; top: 37%; left: 38%; width: ' + outlineSize + 'px; height: ' + outlineSize + 'px; margin-top: -' + (outlineSize / 2) + 'px; margin-left: -' + (outlineSize / 2) + 'px; border: ' + outlineThickness + 'px solid ' + outlineColor + '; border-radius: 50%;"></div>' + // Circular outline
+              '<i style="color: ' + iconColor + '; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 12px;" class="fas fa-circle"></i>' +
               '<span style="' + labelStyle + '">' + plot + '</span></div>'
     });
 
@@ -2279,7 +2304,7 @@ function getOneMarker(feature, latlng) {
     });
 }
 
-       
+
 
         var oneLayer = L.geoJson(null, {
             pointToLayer: getOneMarker,
@@ -2287,7 +2312,7 @@ function getOneMarker(feature, latlng) {
         }).addTo(map);
 
         // Fetch the GeoJSON data and add it to the oneLayer
-        var geojsonUrl1 = "https://raw.githubusercontent.com/sean-roelofsen/DDT_Orchard/main/Full_DDT.geojson";
+        var geojsonUrl1 = "https://raw.githubusercontent.com/sean-roelofsen/DDT_Orchard/main/Full_Results_Near.geojson";
         fetch(geojsonUrl1)
             .then(response => response.json())
             .then(data => {
@@ -2843,7 +2868,7 @@ var contactsButton = L.easyButton({
         onClick: function() {
             // Open a new window with the text "CONTACTS TBD"
             var contactsWindow = window.open('', '_blank');
-            contactsWindow.document.write('<html><head><title>Contacts</title></head><body><p>CONTACTS TBD<br> WCR TSS</p></body></html>');
+            contactsWindow.document.write('<html><head><title>Contacts</title></head><body><p>optional contact info<br>CONTACTS TBD<br> WCR NDO</p></body></html>');
             contactsWindow.document.close();
         }
     }]
@@ -3009,6 +3034,43 @@ legend.onAdd = function (map) {
 legend.addTo(map);
 
 */
+
+// Create the legend
+        var legend = L.control({position: 'bottomright'});
+
+legend.onAdd = function (map) {
+    var div = L.DomUtil.create('div', 'info legend'),
+        ranges = ['<500', '501-1000', '1001-2000', '2001-3000', '>3001'],
+        colors = ['green', 'blue', 'brown', 'orange', 'red'],
+        labels = [];
+
+    // Add a title to the legend
+    div.innerHTML = '<h4 style="margin: 0; padding: 3px; text-align: center;">DDX (ng/g)</h4>'; // Center the title and add padding
+
+    // Loop through the ranges and generate a label with a colored circle for each
+    for (var i = 0; i < ranges.length; i++) {
+        labels.push(
+            '<div style="display: flex; align-items: center; justify-content: flex-start; margin-bottom: 4px;">' + // Align items to the start
+            '<i style="width: 14px; height: 14px; border: 3.5px solid ' + colors[i] + '; border-radius: 50%; margin-right: 4px; background: none;"></i>' +
+            '<span>' + ranges[i] + '</span>' +
+            '</div>'
+        );
+    }
+
+    // Join the labels and add them to the div
+    div.innerHTML += labels.join('');
+
+    // Add white transparent background to the legend div
+    div.style.backgroundColor = 'rgba(255, 255, 255, 0.5)';
+    div.style.padding = '7px';
+    div.style.borderRadius = '4px';
+    div.style.boxShadow = '0 0 5px rgba(0, 0, 0, 0.2)'; // Optional: Add a subtle shadow for better visibility
+
+    return div;
+};
+
+legend.addTo(map);
+
 
 	</script>
 </body>
