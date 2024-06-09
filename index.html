@@ -2271,11 +2271,11 @@ function getOutlineColor(value) {
             } else if (value <= 1000) {
                 return 'blue';
             } else if (value <= 2000) {
-                return 'brown';
-            } else if (value <= 3000) {
                 return 'orange';
-            } else {
+            } else if (value <= 3000) {
                 return 'red';
+            } else {
+                return 'brown';
             }
         }
 
@@ -3041,7 +3041,7 @@ legend.addTo(map);
 legend.onAdd = function (map) {
     var div = L.DomUtil.create('div', 'info legend'),
         ranges = ['<500', '501-1000', '1001-2000', '2001-3000', '>3001'],
-        colors = ['green', 'blue', 'brown', 'orange', 'red'],
+        colors = ['green', 'blue', 'orange', 'red', 'brown'],
         labels = [];
 
     // Add a title to the legend
