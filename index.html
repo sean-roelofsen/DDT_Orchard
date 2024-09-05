@@ -1473,9 +1473,9 @@ popupText += (feature.properties.Treatment_Types) ? '<br><br>Treatment:<br>' + f
 popupText += (feature.properties.Geologic_Formation) ? '<br><br>Geologic Formation:<br>' + feature.properties.Geologic_Formation : '';
 //**************DDT Orchard pop-ups below*********
 
-popupText += (feature.properties.Farm_Name) ? ' ' + feature.properties.Farm_Name : '';
+popupText += (feature.properties.Farm_Name) ? '<b>' + feature.properties.Farm_Name : '';
 
-popupText += (feature.properties.Farm_Address) ? '<br> ' + feature.properties.Farm_Address : '';
+popupText += (feature.properties.Farm_Address) ? '</b><br> ' + feature.properties.Farm_Address : '';
 
 popupText += (feature.properties.Municipality) ? '<br> ' + feature.properties.Municipality : '';
 
@@ -1491,7 +1491,7 @@ popupText += (feature.properties.d44DDEpp) ? '<br>4,4-DDE (p,p-DDE): ' + feature
 
 popupText += (feature.properties.eDDToppp) ? '<br>DDT (op+pp): ' + feature.properties.eDDToppp : '';
 
-popupText += (feature.properties.fDDX) ? '<br><b>DDX: </b>' + feature.properties.fDDX : '';
+popupText += (feature.properties.fDDX) ? '<br><b><u>DDX: </b></u>' + feature.properties.fDDX : '';
 
 //popupText += (feature.properties.F__DTT) ? '</b><br>% DTT: ' + feature.properties.F__DTT : '';
 
@@ -1509,6 +1509,11 @@ popupText += (feature.properties.Orchard__3) ? '<br>Municipality: ' + feature.pr
 
 popupText += (feature.properties.OFFICIAL_N) ? '<br>Name: ' + feature.properties.OFFICIAL_N : '';
 // "STREET_NUM":"725","STREET_NAM":"Lakeshore","SUFFIX":"Road","DIRECTION":"","P_O_BOX":"","MUNICIPALI":"Fort Erie",
+
+popupText += (feature.properties.Group) ? '<br><br>Group: ' + feature.properties.Group : '';
+
+popupText += (feature.properties.Year_Start) ? '<br>Year Start: ' + feature.properties.Year_Start : '';
+popupText += (feature.properties.Total_Years) ? '<br>Years In Operation: ' + feature.properties.Total_Years : '';
 
 //feeding trenary results through a replace function in order to format URLs into proper clickable hyperlinks in the popups
 //if they have URLs in the geojson properties, will pull in as a hyperlink but does not ensure the link is working on their other end
