@@ -1338,7 +1338,7 @@ popupText += (feature.properties.USER_DWS_1) ? '<br>DWS #: ' + feature.propertie
 
 popupText += (feature.properties.Address_short) ? '<br>' + feature.properties.Address_short : '';
 
-popupText += (feature.properties.Municipality) ? ', ' + feature.properties.Municipality : '';
+//popupText += (feature.properties.Municipality) ? ', ' + feature.properties.Municipality : '';
 
 popupText += (feature.properties.County) ? '<br>' + feature.properties.County : '';
 
@@ -1358,7 +1358,7 @@ popupText += (feature.properties.STREET_NAM) ? ' ' + feature.properties.STREET_N
 
 popupText += (feature.properties.SUFFIX) ? ' ' + feature.properties.SUFFIX : '';
 
-popupText += (feature.properties.MUNICIPALI) ? '<br>' + feature.properties.MUNICIPALI : '';
+//popupText += (feature.properties.MUNICIPALI) ? '<br>' + feature.properties.MUNICIPALI : '';
 
 popupText += (feature.properties.USER_City) ? ', ' + feature.properties.USER_City : '';
 
@@ -1475,25 +1475,25 @@ popupText += (feature.properties.Geologic_Formation) ? '<br><br>Geologic Formati
 
 popupText += (feature.properties.Farm_Name) ? ' ' + feature.properties.Farm_Name : '';
 
-popupText += (feature.properties.Farm_Addre) ? '<br> ' + feature.properties.Farm_Addre : '';
+popupText += (feature.properties.Farm_Address) ? '<br> ' + feature.properties.Farm_Address : '';
 
-popupText += (feature.properties.Municipali) ? '<br> ' + feature.properties.Municipali : '';
+popupText += (feature.properties.Municipality) ? '<br> ' + feature.properties.Municipality : '';
 
 popupText += (feature.properties.Site_Plot) ? '<br><br><b>Sample Site: </b>' + feature.properties.Site_Plot : '';
 
-popupText += (feature.properties.F2_4__DDT_) ? '<br><u>Results (ng/g)</u>:<br>2,4-DDT (o,p-DDT): ' + feature.properties.F2_4__DDT_ : '';
+popupText += (feature.properties.a24DDTop) ? '<br><u>Results (ng/g)</u>:<br>2,4-DDT (o,p-DDT): ' + feature.properties.a24DDTop : '';
 
-popupText += (feature.properties.F4_4__DDT_) ? '<br>4,4-DDT (p,p-DDT): ' + feature.properties.F4_4__DDT_ : '';
+popupText += (feature.properties.b44DDTpp) ? '<br>4,4-DDT (p,p-DDT): ' + feature.properties.b44DDTpp : '';
 
-popupText += (feature.properties.F4_4__DDD_) ? '<br>4,4-DDD (p,p-DDD): ' + feature.properties.F4_4__DDD_ : '';
+popupText += (feature.properties.c44DDDpp) ? '<br>4,4-DDD (p,p-DDD): ' + feature.properties.c44DDDpp : '';
 
-popupText += (feature.properties.F4_4__DDE_) ? '<br>4,4-DDE (p,p-DDE): ' + feature.properties.F4_4__DDE_ : '';
+popupText += (feature.properties.d44DDEpp) ? '<br>4,4-DDE (p,p-DDE): ' + feature.properties.d44DDEpp : '';
 
-popupText += (feature.properties.DDT__op_pp) ? '<br>DDT (op+pp): ' + feature.properties.DDT__op_pp : '';
+popupText += (feature.properties.eDDToppp) ? '<br>DDT (op+pp): ' + feature.properties.eDDToppp : '';
 
-popupText += (feature.properties.DDX_ng_g) ? '<br><b>DDX: ' + feature.properties.DDX_ng_g : '';
+popupText += (feature.properties.fDDX) ? '<br><b>DDX: </b>' + feature.properties.fDDX : '';
 
-popupText += (feature.properties.F__DTT) ? '</b><br>% DTT: ' + feature.properties.F__DTT : '';
+//popupText += (feature.properties.F__DTT) ? '</b><br>% DTT: ' + feature.properties.F__DTT : '';
 
 popupText += (feature.properties.NEAR_DIST) ? '<br><br><u>To Nearest Watercourse</u><br>Distance (m):  ' + feature.properties.NEAR_DIST.toFixed(1) : '';
 
@@ -2289,7 +2289,7 @@ function getOutlineColor(value) {
 function getOneMarker(feature, latlng) {
     var iconColor = '#FFD43b'; // Define the icon color
     var plot = feature.properties.Plot; // Assuming "Plot" column has the Roman numeral as a string
-    var ddxValue = feature.properties.DDX_ng_g; // Get the value for coloring the outline
+    var ddxValue = feature.properties.fDDX; // Get the value for coloring the outline
     var outlineColor = getOutlineColor(ddxValue); // Determine the outline color
 
     var labelStyle = 'position: absolute; font-size: 12px; top: 50%; left: 50%; transform: translate(-50%, -50%); color: black;'; // Adjust font-size and color as needed
@@ -2320,7 +2320,7 @@ var oneLayer = L.geoJson(null, {
 
 // Function to filter features by selected range
 function filterByRange(feature, selectedRanges) {
-    var ddxValue = feature.properties.DDX_ng_g;
+    var ddxValue = feature.properties.fDDX;
 
     for (var i = 0; i < selectedRanges.length; i++) {
         var range = selectedRanges[i];
@@ -2400,7 +2400,7 @@ legend.onAdd = function(map) {
 legend.addTo(map);
 
 // GeoJSON URL
-var geojsonUrl1 = "https://raw.githubusercontent.com/sean-roelofsen/DDT_2/main/Full_NMB.geojson";
+var geojsonUrl1 = "https://raw.githubusercontent.com/sean-roelofsen/DDT_2/main/Full_Results_DDT_NMB5.geojson";
 
 // **Fetch the data initially and add it using the custom marker creation**
 fetch(geojsonUrl1)
