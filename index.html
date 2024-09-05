@@ -5,7 +5,7 @@
 <head>
 
 <meta charset=utf-8 />
-<title>Orchard Sample Map Tool</title>
+<title>Niagara Orchard DDT Sample Map Tool</title>
 <link rel="icon" href='https://raw.githubusercontent.com/sean-roelofsen/DDT_Orchard/main/favicon.ico' type="image/x-icon">
 <meta name="viewport" content='width=device-width, initial-scale=1, maximum-scale=1,user-scalable=no'/>
 <meta name="apple-mobile-web-app-title" content="Niagara Orchards">
@@ -2265,21 +2265,28 @@ $.getJSON(geoJson32, function(data) {
 }
 
 */
+// Function to get the outline color based on DDX value
+// Function to get the outline color based on DDX value
+// Function to get the outline color based on DDX value
+// Function to get the outline color based on DDX value
+// Function to get the outline color based on DDX value
+// Function to get the outline color based on DDX value
 function getOutlineColor(value) {
-            if (value < 500) {
-                return 'green';
-            } else if (value <= 1000) {
-                return 'blue';
-            } else if (value <= 2000) {
-                return 'orange';
-            } else if (value <= 3000) {
-                return 'red';
-            } else {
-                return 'brown';
-            }
-        }
+    if (value < 1000) {
+        return 'green';
+    } else if (value <= 3000) {
+        return 'blue';
+    } else if (value <= 5000) {
+        return 'orange';
+    } else if (value <= 7000) {
+        return 'red';
+    } else {
+        return 'brown';
+    }
+}
 
-        function getOneMarker(feature, latlng) {
+// Function to create a marker with an outline and label
+function getOneMarker(feature, latlng) {
     var iconColor = '#FFD43b'; // Define the icon color
     var plot = feature.properties.Plot; // Assuming "Plot" column has the Roman numeral as a string
     var ddxValue = feature.properties.DDX_ng_g; // Get the value for coloring the outline
@@ -2305,22 +2312,103 @@ function getOutlineColor(value) {
 }
 
 
+// Define global variable for the filtered data layer
+var oneLayer = L.geoJson(null, {
+    pointToLayer: getOneMarker,  // Always use the custom marker creation function
+    onEachFeature: getPopup      // Attach popups
+}); 
 
-        var oneLayer = L.geoJson(null, {
-            pointToLayer: getOneMarker,
-            onEachFeature: getPopup
-        }).addTo(map);
+// Function to filter features by selected range
+function filterByRange(feature, selectedRanges) {
+    var ddxValue = feature.properties.DDX_ng_g;
 
-        // Fetch the GeoJSON data and add it to the oneLayer
-        var geojsonUrl1 = "https://raw.githubusercontent.com/sean-roelofsen/DDT_Orchard/main/Full_Results_Near.geojson";
-        fetch(geojsonUrl1)
-            .then(response => response.json())
-            .then(data => {
-                oneLayer.addData(data);
-            })
-            .catch(error => console.error('Error fetching GeoJSON data:', error));
+    for (var i = 0; i < selectedRanges.length; i++) {
+        var range = selectedRanges[i];
 
+        if (range === 'green' && ddxValue < 1000) {
+            return true;
+        } else if (range === 'blue' && ddxValue >= 1000 && ddxValue <= 3000) {
+            return true;
+        } else if (range === 'orange' && ddxValue > 3000 && ddxValue <= 5000) {
+            return true;
+        } else if (range === 'red' && ddxValue > 5000 && ddxValue <= 7000) {
+            return true;
+        } else if (range === 'brown' && ddxValue > 7000) {
+            return true;
+        }
+    }
 
+    return false;
+}
+
+// Function to update the map based on the selected filters
+function updateLayer() {
+    // Get selected ranges from the checkboxes
+    var selectedRanges = [];
+    document.querySelectorAll('input[name="legend-filter"]:checked').forEach(function(checkbox) {
+        selectedRanges.push(checkbox.value);
+    });
+
+    // Clear the layer and add filtered data
+    oneLayer.clearLayers();
+
+    // Fetch the data and filter based on the selected ranges
+    fetch(geojsonUrl1)
+        .then(response => response.json())
+        .then(data => {
+            L.geoJson(data, {
+                pointToLayer: getOneMarker,  // Use custom marker function
+                onEachFeature: getPopup,     // Popups
+                filter: function(feature) {
+                    return filterByRange(feature, selectedRanges);
+                }
+            }).addTo(oneLayer);  // Add to `oneLayer` which is already on the map
+        })
+        .catch(error => console.error('Error fetching GeoJSON data:', error));
+}
+
+// Create a new legend control with checkboxes for filtering
+var legend = L.control({position: 'bottomright'});
+
+legend.onAdd = function(map) {
+    var div = L.DomUtil.create('div', 'info legend'),
+        ranges = ['<1000', '1001-3000', '3001-5000', '5001-7001', '>7001'],
+        colors = ['green', 'blue', 'orange', 'red', 'brown'];
+
+    // Add a title to the legend
+    div.innerHTML = '<h4 style="margin: 0; padding: 3px; text-align: center;">DDX (ng/g)</h4>'; 
+
+    // Loop through the ranges and generate a checkbox for each range
+    for (var i = 0; i < ranges.length; i++) {
+        div.innerHTML +=
+            '<div style="display: flex; align-items: center; justify-content: flex-start; margin-bottom: 4px;">' +
+            '<input type="checkbox" name="legend-filter" value="' + colors[i] + '" checked style="margin-right: 6px;" onchange="updateLayer()" />' + 
+            '<i style="width: 14px; height: 14px; border: 3.5px solid ' + colors[i] + '; border-radius: 50%; margin-right: 4px;"></i>' + 
+            '<span>' + ranges[i] + '</span>' +
+            '</div>';
+    }
+
+    // Add white transparent background to the legend div
+    div.style.backgroundColor = 'rgba(255, 255, 255, 0.5)';
+    div.style.padding = '7px';
+    div.style.borderRadius = '4px';
+    div.style.boxShadow = '0 0 5px rgba(0, 0, 0, 0.2)';
+
+    return div;
+};
+
+legend.addTo(map);
+
+// GeoJSON URL
+var geojsonUrl1 = "https://raw.githubusercontent.com/sean-roelofsen/DDT_2/main/Full_NMB.geojson";
+
+// **Fetch the data initially and add it using the custom marker creation**
+fetch(geojsonUrl1)
+    .then(response => response.json())
+    .then(data => {
+        oneLayer.addData(data); // Add the data to `oneLayer` using the custom marker function
+    })
+    .catch(error => console.error('Error fetching GeoJSON data:', error));
 
 /*
 //***************BIENNIAL MONITORING*************************
@@ -2587,7 +2675,7 @@ fetch(geojsonUrl7)
 
 //var geojsonUrl8 = 'https://raw.githubusercontent.com/sean-roelofsen/DDT_Orchard/main/Orchard_Properties_4.geojson';
 
-var geojsonUrl8 = 'https://raw.githubusercontent.com/sean-roelofsen/DDT_Orchard/main/Orchard_Properties_4.geojson';
+var geojsonUrl8 = 'https://raw.githubusercontent.com/sean-roelofsen/DDT_2/main/Orchards_NMB.geojson';
 
         function getColor(name) {
             // Define a color mapping for the "Name" property
@@ -2604,6 +2692,7 @@ var geojsonUrl8 = 'https://raw.githubusercontent.com/sean-roelofsen/DDT_Orchard/
                 'Hipple Farms': '#bc80bd', // Green
                 'Warner Farms': '#ccebc5', // Blue
                 'Lincoln Line Orchards': '#ffed6f', // Blue
+                'NM Bartlett Farms': '#fccde5', // Blue
                 // Add more mappings as needed
             };
             return colors[name] || '#FFFFFF'; // Default color if name is not in the mapping
@@ -2650,56 +2739,19 @@ var geojsonUrl8 = 'https://raw.githubusercontent.com/sean-roelofsen/DDT_Orchard/
 
 
 //******************* END GEOJSON LAYER CODE************************
-
-
-
+// Layer control for toggling layers (ensure the layer is checked and visible by default)
 var overlays = {
     '---Orchard Sampling Project---': zeroLayer,
-    'Sample Locations': oneLayer,
-    //'Biennial Frequency Wells': twoLayer,
-    //'Remove from program': threeLayer,
-    //'----------Additional Info-----------': zero1Layer,
-    //'Permits-To-Take-Water (PTTW)': sixLayer,
-    //'MECP WWIS Database Wells': fourLayer,
-    //'OP 500m Restriction Zone': fiveLayer,
+    'Sample Locations': oneLayer,  // Sample locations with DDX filtering
     'Orchard Properties': eightLayer,
     'Watercourses': sevenLayer,
-    //'DW Storage Facilities': twentytwoLayer,
-    
-    //'Wastewater Treatment Plants': twentythreeLayer,
-    //'Wastewater Pumping Stations': twentyfourLayer,
-    //'Watersheds': twoLayer,
-    /*'-----------Municipal Boundaries----------': zero1Layer,
-    'City of Toronto': twentyLayerGroup,
-    'Durham Region': twentyoneLayerGroup,
-    'York Region': twentytwoLayerGroup,
-    'Halton Region': twentythreeLayerGroup,
-    'Peel Region': twentyfourLayerGroup,
-    '-------Water Treatment Infrastructure-----': zero4Layer,
-    'Water Treatment Plants: SW Intakes': twentyeightLayer,    
-    'Intake Protection Zone 2 - IPZ2s': thirtyoneLayer,
-    'Intake Protection Zone 1 - IPZ1s': thirtyLayer,
-    'Drinking Water Production Wells (GW)': twentynineLayer,
-    'Wellhead Protection Area - WHPAs': thirtytwoLayer,
-    //'                                     ': zero2Layer, 
-    '---Source Protection, Watershed & Health---': zero2Layer,
-    'Wastewater Treatment Plants': sixLayer,
-    'Source Protection Plan Areas': twentyfiveLayer,
-    'Lake Simcoe Protection Act Boundary': elevenLayer,
-    'Protected Areas (Greenbelt, NEC, ORM)': fiveLayer,
-    'Conservation Authorities': fourLayer,
-    'Central Region Watersheds': threeLayer,  
-    'Public Health Units': twentysixLayer,  
-    //'NPRI Release Data (2022)': twentysevenLayer,
-    //'WSER Effluent Data': tenLayer,   
-    //'Population Density/km2': fiftyLayerGroup,
-    //'Power Plants': fiftytwoLayerGroup,
-    */
-        
-       };
+};
 
+// Add the layer control, ensuring `oneLayer` is checked by adding it to `map` at the start
 L.control.layers(null, overlays, {position: 'topright'}).addTo(map);
 
+// Make sure `oneLayer` is added to the map by default, so it is visible and controlled by the layer control
+oneLayer.addTo(map);
 
 //var layerbox = L.control.layers(null, overlays, {position: 'topright'}).addTo(map);
 //Legend png overlay
@@ -3035,41 +3087,7 @@ legend.addTo(map);
 
 */
 
-// Create the legend
-        var legend = L.control({position: 'bottomright'});
 
-legend.onAdd = function (map) {
-    var div = L.DomUtil.create('div', 'info legend'),
-        ranges = ['<500', '501-1000', '1001-2000', '2001-3000', '>3001'],
-        colors = ['green', 'blue', 'orange', 'red', 'brown'],
-        labels = [];
-
-    // Add a title to the legend
-    div.innerHTML = '<h4 style="margin: 0; padding: 3px; text-align: center;">DDX (ng/g)</h4>'; // Center the title and add padding
-
-    // Loop through the ranges and generate a label with a colored circle for each
-    for (var i = 0; i < ranges.length; i++) {
-        labels.push(
-            '<div style="display: flex; align-items: center; justify-content: flex-start; margin-bottom: 4px;">' + // Align items to the start
-            '<i style="width: 14px; height: 14px; border: 3.5px solid ' + colors[i] + '; border-radius: 50%; margin-right: 4px; background: none;"></i>' +
-            '<span>' + ranges[i] + '</span>' +
-            '</div>'
-        );
-    }
-
-    // Join the labels and add them to the div
-    div.innerHTML += labels.join('');
-
-    // Add white transparent background to the legend div
-    div.style.backgroundColor = 'rgba(255, 255, 255, 0.5)';
-    div.style.padding = '7px';
-    div.style.borderRadius = '4px';
-    div.style.boxShadow = '0 0 5px rgba(0, 0, 0, 0.2)'; // Optional: Add a subtle shadow for better visibility
-
-    return div;
-};
-
-legend.addTo(map);
 
 
 	</script>
