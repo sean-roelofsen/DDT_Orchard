@@ -88,14 +88,14 @@
 
 /* Hide checkboxes for the 1st, 4th, and 10th layers */
 .leaflet-control-layers-overlays label:nth-child(1) .leaflet-control-layers-selector,
-.leaflet-control-layers-overlays label:nth-child(5) .leaflet-control-layers-selector,
+.leaflet-control-layers-overlays label:nth-child(9) .leaflet-control-layers-selector,
 .leaflet-control-layers-overlays label:nth-child(13) .leaflet-control-layers-selector {
     display: none; /* Hides the checkbox */
 }
 
 /* Optionally, disable pointer events for these labels to prevent clicking */
 .leaflet-control-layers-overlays label:nth-child(1),
-.leaflet-control-layers-overlays label:nth-child(5),
+.leaflet-control-layers-overlays label:nth-child(9),
 .leaflet-control-layers-overlays label:nth-child(13) {
     pointer-events: none;
     font-weight: bold; /* Makes the text bold */
@@ -493,7 +493,7 @@ p {
             max-width: 80%;
         }
     .leaflet-control-layers-overlays label:nth-child(1),
-    .leaflet-control-layers-overlays label:nth-child(5),
+    .leaflet-control-layers-overlays label:nth-child(9),
     .leaflet-control-layers-overlays label:nth-child(13) {
         font-size: 1.1em; /* Slightly larger font size for better readability */
       }
@@ -2735,6 +2735,41 @@ var geojsonUrl8 = 'https://raw.githubusercontent.com/sean-roelofsen/DDT_2/main/O
             })
             .catch(error => console.error('Error fetching GeoJSON data:', error));
 
+//************************************************
+
+// Function to create a red bullseye marker for tenLayer
+// Function to create a red bullseye marker for tenLayer
+function getTenMarker(feature, latlng) {
+    var icon1 = L.divIcon({
+        className: '', // Custom class if needed
+        html: '<div style="position: relative; text-align: center; width: 28px; height: 28px;">' +
+              '<i style="color: red; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 28px;" class="fas fa-bullseye"></i>' +
+              '</div>'
+    });
+
+    return L.marker(latlng, { icon: icon1 });
+}
+
+// tenLayer for adding the GeoJSON point layer with red bullseye markers and popups
+var tenLayer = L.geoJson(null, {
+    pointToLayer: getTenMarker, // Use custom marker creation function for red bullseye
+    onEachFeature: getPopup     // Attach popups using the existing getPopup function
+});
+
+// Fetch data for tenLayer and bring it to the front
+var geojsonUrl10 = "https://raw.githubusercontent.com/sean-roelofsen/DDT_2/main/targets.geojson";
+fetch(geojsonUrl10)
+    .then(response => response.json())
+    .then(data => {
+        tenLayer.addData(data);   // Add data to tenLayer
+        tenLayer.bringToFront();  // Bring the target icons to the front of all layers
+    })
+    .catch(error => console.error('Error fetching GeoJSON data:', error));
+
+// Do not add tenLayer to the map by default, it will be toggled on via the layer control.
+
+
+
 //*****************ZERO LAYER LABELS***************
   var zeroLayer = L.geoJson(false, {
     });
@@ -2750,6 +2785,7 @@ var overlays = {
     'Sample Locations': oneLayer,  // Sample locations with DDX filtering
     'Orchard Properties': eightLayer,
     'Watercourses': sevenLayer,
+    'Sample Targets': tenLayer,
 };
 
 // Add the layer control, ensuring `oneLayer` is checked by adding it to `map` at the start
